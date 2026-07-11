@@ -32,3 +32,14 @@ def database_health(db: Session = Depends(get_db)):
     return {
         "database": "connected"
     }
+
+from app.ingestion.openaq_client import OpenAQClient
+
+@app.get("/test/openaq")
+async def test_openaq():
+
+    client = OpenAQClient()
+
+    data = await client.get_locations()
+
+    return data

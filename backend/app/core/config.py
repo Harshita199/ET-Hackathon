@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
 
     DATABASE_URL: str
+    OPENAQ_BASE_URL: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
