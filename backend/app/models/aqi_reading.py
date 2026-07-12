@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index
+# from sqlalchemy import DateTime, Float, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import DateTime, Float, ForeignKey, UniqueConstraint
 
 from app.models.base_model import BaseModel
 
@@ -31,9 +34,18 @@ class AQIReading(BaseModel):
     o3: Mapped[float | None] = mapped_column(Float)
 
     station: Mapped["AQIStation"] = relationship(
-        back_populates="aqi_readings"
+        "AQIStation",
+        back_populates="aqi_readings",
     )
 
     __table_args__ = (
-        Index("idx_station_timestamp", "station_id", "timestamp"),
-    )
+       UniqueConstraint(
+        "station_id",
+        "timestamp",
+        name="uq_station_timestamp",
+    ),
+)
+
+    # __table_args__ = (
+    #     Index("idx_station_timestamp", "station_id", "timestamp"),
+    # )

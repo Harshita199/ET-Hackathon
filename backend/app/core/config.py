@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
     OPENAQ_BASE_URL: str
+    WAQI_BASE_URL: str
+    WAQI_API_KEY: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

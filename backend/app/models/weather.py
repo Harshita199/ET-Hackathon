@@ -1,7 +1,0 @@
-station_id
-timestamp
-temperature
-humidity
-wind_speed
-wind_direction
-pressure
