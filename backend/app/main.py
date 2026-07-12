@@ -93,22 +93,30 @@ async def save_station(
 
     data = await client.get_city_data(city)
     
-    parsed = parse_waqi_response(data)
+    # parsed = parse_waqi_response(data)
+    station_data = WAQIParser.parse_station(data)
+    reading_data = WAQIParser.parse_reading(data)
     
-    station = StationService.save(
-        db,
-        parsed["station"],
+    station = StationService.get_or_create(
+       db,
+       station_data,
     )
     
     reading = AQIReadingService.save(
-        db,
-        station,
-        parsed["reading"],
-    )
+      db,
+      station,
+      reading_data,
+)
     
+    # return {
+    #     "message": "Data synced successfully",
+    #     "station": station.station_name,
+    #     "aqi": reading.aqi,
+    #     "timestamp": reading.timestamp,
+    # }
     return {
-        "message": "Data synced successfully",
-        "station": station.station_name,
-        "aqi": reading.aqi,
-        "timestamp": reading.timestamp,
-    }
+      "message": "Data synced successfully",
+      "station": station.station_name,
+      "aqi": reading.aqi,
+      "timestamp": reading.timestamp,
+}
