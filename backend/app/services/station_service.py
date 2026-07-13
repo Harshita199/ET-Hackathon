@@ -37,3 +37,12 @@ class StationService:
             return station
 
         return StationService.create_station(db, station_data)
+    
+    @staticmethod
+    def get_all(db: Session):
+    
+        return (
+            db.query(AQIStation)
+            .order_by(AQIStation.city)
+            .all()
+        )

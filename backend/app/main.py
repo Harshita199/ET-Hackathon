@@ -81,7 +81,7 @@ from app.api.dependencies import get_db
 from app.ingestion.waqi import WAQIClient
 from app.services.waqi_parser import WAQIParser
 from app.services.station_service import StationService
-
+from app.services.aqi_reading_service import AQIReadingService
 
 @app.post("/test/save-station")
 async def save_station(
@@ -120,3 +120,89 @@ async def save_station(
       "aqi": reading.aqi,
       "timestamp": reading.timestamp,
 }
+
+from app.ingestion.cities import DEFAULT_CITIES
+from app.services.sync_service import SyncService
+@app.post("/sync")
+async def sync_all(
+    db: Session = Depends(get_db),
+):
+
+    results = await SyncService.sync_all(
+        DEFAULT_CITIES,
+        db,
+    )
+
+    return {
+        "total": len(results),
+        "success": len([r for r in results if r["status"] == "success"]),
+        "failed": len([r for r in results if r["status"] == "failed"]),
+        "results": results,
+    }
+
+# @app.get("/stations")
+# def get_stations(
+#     db: Session = Depends(get_db),
+# ):
+
+#     stations = StationService.get_all(db)
+
+#     return [
+#         {
+#             "id": str(station.id),
+#             "station_code": station.station_code,
+#             "station_name": station.station_name,
+#             "city": station.city,
+#             "state": station.state,
+#             "latitude": station.latitude,
+#             "longitude": station.longitude,
+#         }
+#         for station in stations
+#     ]
+
+
+
+@app.get("/stations/{station_id}/history")
+def station_history(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+
+    readings = AQIReadingService.get_history(
+        db,
+        station_id,
+    )
+
+    return [
+        {
+            "timestamp": reading.timestamp,
+            "aqi": reading.aqi,
+            "pm25": reading.pm25,
+            "pm10": reading.pm10,
+            "co": reading.co,
+            "no2": reading.no2,
+            "so2": reading.so2,
+            "o3": reading.o3,
+            "temperature": reading.temperature,
+            "humidity": reading.humidity,
+            "wind_speed": reading.wind_speed,
+            "pressure": reading.pressure,
+        }
+        for reading in readings
+    ]
+
+from app.services.dashboard_service import DashboardService
+@app.get("/summary")
+def summary(
+    db: Session = Depends(get_db),
+):
+    return DashboardService.get_summary(db)
+
+
+
+from app.services.station_query_service import StationQueryService
+@app.get("/stations")
+def get_stations(
+    db: Session = Depends(get_db),
+):
+    return StationQueryService.get_all(db)

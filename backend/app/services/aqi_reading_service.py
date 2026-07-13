@@ -46,3 +46,14 @@ class AQIReadingService:
         db.refresh(reading)
 
         return reading
+
+    @staticmethod
+    def get_history(db: Session, station_id: str, limit: int = 100):
+    
+        return (
+            db.query(AQIReading)
+            .filter(AQIReading.station_id == station_id)
+            .order_by(AQIReading.timestamp.desc())
+            .limit(limit)
+            .all()
+        )

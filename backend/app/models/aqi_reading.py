@@ -33,6 +33,21 @@ class AQIReading(BaseModel):
     co: Mapped[float | None] = mapped_column(Float)
     o3: Mapped[float | None] = mapped_column(Float)
 
+    aqi: Mapped[float | None] = mapped_column(Float)
+    pm25: Mapped[float | None] = mapped_column(Float)
+    pm10: Mapped[float | None] = mapped_column(Float)
+    
+    no2: Mapped[float | None] = mapped_column(Float)
+    so2: Mapped[float | None] = mapped_column(Float)
+    co: Mapped[float | None] = mapped_column(Float)
+    o3: Mapped[float | None] = mapped_column(Float)
+    
+    temperature: Mapped[float | None] = mapped_column(Float)
+    humidity: Mapped[float | None] = mapped_column(Float)
+    wind_speed: Mapped[float | None] = mapped_column(Float)
+    wind_direction: Mapped[float | None] = mapped_column(Float)
+    pressure: Mapped[float | None] = mapped_column(Float)
+    
     station: Mapped["AQIStation"] = relationship(
         "AQIStation",
         back_populates="aqi_readings",
