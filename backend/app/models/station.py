@@ -45,3 +45,9 @@ class AQIStation(BaseModel):
         back_populates="station",
         cascade="all, delete-orphan",
     )
+
+    weather_readings: Mapped[list["WeatherReading"]] = relationship(
+      "WeatherReading",
+      back_populates="station",
+      cascade="all, delete-orphan",
+)

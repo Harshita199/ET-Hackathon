@@ -57,3 +57,22 @@ class WAQIParser:
         """
 
         return payload["data"].get("forecast", {})
+    
+    @staticmethod
+    def parse_weather(payload: dict) -> dict:
+    
+        data = payload["data"]
+        iaqi = data.get("iaqi", {})
+    
+        def value(key):
+            item = iaqi.get(key)
+            return item.get("v") if item else None
+    
+        return {
+            "timestamp": datetime.fromisoformat(data["time"]["iso"]),
+            "temperature": value("t"),
+            "humidity": value("h"),
+            "pressure": value("p"),
+            "wind_speed": value("w"),
+            "wind_direction": value("wd"),
+        }

@@ -4,6 +4,7 @@ from app.ingestion.waqi import WAQIClient
 from app.services.waqi_parser import WAQIParser
 from app.services.station_service import StationService
 from app.services.aqi_reading_service import AQIReadingService
+from backend.app.services.weather_service import WeatherService
 
 
 class SyncService:
@@ -26,6 +27,7 @@ class SyncService:
 
                 station_data = WAQIParser.parse_station(payload)
                 reading_data = WAQIParser.parse_reading(payload)
+                weather_data = WAQIParser.parse_weather(payload)
 
                 station = StationService.get_or_create(
                     db,
@@ -38,11 +40,23 @@ class SyncService:
                     reading_data,
                 )
 
+                WeatherService.save(
+                         db,
+                         station,
+                         weather_data,
+                    )
+
                 results.append({
                     "city": city,
                     "status": "success",
                     "aqi": reading_data["aqi"],
                 })
+
+                # WeatherService.save(
+                #          db,
+                #          station,
+                #          weather_data,
+                #     )
 
             except Exception as e:
 
