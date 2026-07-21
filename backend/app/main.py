@@ -254,3 +254,32 @@ def features(db: Session = Depends(get_db)):
     records = feature_df.to_dict(orient="records")
 
     return jsonable_encoder(records)
+
+from app.ml.train_model import AQIModelTrainer
+
+
+@app.post("/ml/train")
+def train_model(
+    db: Session = Depends(get_db),
+):
+    return AQIModelTrainer.train(db)
+
+from app.ml.predictor import AQIPredictor
+@app.get("/ml/predict/{station_id}")
+def predict(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+
+    result = AQIPredictor.predict(
+        db,
+        station_id,
+    )
+
+    if result is None:
+        return {
+            "status": "failed",
+            "message": "Not enough data for prediction."
+        }
+
+    return result
