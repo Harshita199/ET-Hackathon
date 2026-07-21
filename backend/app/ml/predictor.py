@@ -1,4 +1,5 @@
 import joblib
+import numpy as np
 import pandas as pd
 
 from pathlib import Path
@@ -6,11 +7,37 @@ from sqlalchemy.orm import Session
 
 from app.models.station import AQIStation
 from app.models.aqi_reading import AQIReading
+from app.ml.insights import AQIInsights
 
 
 class AQIPredictor:
 
     MODEL_PATH = Path("models/aqi_model.pkl")
+
+    FEATURES = [
+        "latitude",
+        "longitude",
+        "pm25",
+        "pm10",
+        "co",
+        "no2",
+        "so2",
+        "o3",
+        "temperature",
+        "humidity",
+        "pressure",
+        "wind_speed",
+        "wind_direction",
+        "year",
+        "month",
+        "day",
+        "hour",
+        "weekday",
+        "aqi_lag_1",
+        "aqi_lag_2",
+        "aqi_lag_3",
+        "aqi_mean_3",
+    ]
 
     @classmethod
     def load_model(cls):
@@ -28,7 +55,9 @@ class AQIPredictor:
         )
 
         if station is None:
-            return None
+            return {
+                "error": "Station not found"
+            }
 
         readings = (
             db.query(AQIReading)
@@ -39,89 +68,83 @@ class AQIPredictor:
         )
 
         if len(readings) < 3:
-            return None
+            return {
+                "error": "Not enough historical readings"
+            }
 
         latest = readings[0]
 
-        df = pd.DataFrame(
-            [
-                {
-                    # Location Features
-                    "latitude": station.latitude,
-                    "longitude": station.longitude,
+        data = {
+            # Location
+            "latitude": station.latitude,
+            "longitude": station.longitude,
 
-                    # Pollution Features
-                    "pm25": latest.pm25,
-                    "pm10": latest.pm10,
-                    "co": latest.co,
-                    "no2": latest.no2,
-                    "so2": latest.so2,
-                    "o3": latest.o3,
+            # Pollutants
+            "pm25": latest.pm25,
+            "pm10": latest.pm10,
+            "co": latest.co,
+            "no2": latest.no2,
+            "so2": latest.so2,
+            "o3": latest.o3,
 
-                    # Weather Features
-                    "temperature": latest.temperature,
-                    "humidity": latest.humidity,
-                    "pressure": latest.pressure,
-                    "wind_speed": latest.wind_speed,
-                    "wind_direction": latest.wind_direction,
+            # Weather
+            "temperature": latest.temperature,
+            "humidity": latest.humidity,
+            "pressure": latest.pressure,
+            "wind_speed": latest.wind_speed,
+            "wind_direction": latest.wind_direction,
 
-                    # Time Features
-                    "year": latest.timestamp.year,
-                    "month": latest.timestamp.month,
-                    "day": latest.timestamp.day,
-                    "hour": latest.timestamp.hour,
-                    "weekday": latest.timestamp.weekday(),
+            # Time
+            "year": latest.timestamp.year,
+            "month": latest.timestamp.month,
+            "day": latest.timestamp.day,
+            "hour": latest.timestamp.hour,
+            "weekday": latest.timestamp.weekday(),
 
-                    # Historical AQI Features
-                    "aqi_lag_1": readings[0].aqi,
-                    "aqi_lag_2": readings[1].aqi,
-                    "aqi_lag_3": readings[2].aqi,
-                    "aqi_mean_3": (
-                        readings[0].aqi
-                        + readings[1].aqi
-                        + readings[2].aqi
-                    ) / 3,
-                }
-            ]
-        )
+            # Historical AQI
+            "aqi_lag_1": readings[0].aqi,
+            "aqi_lag_2": readings[1].aqi,
+            "aqi_lag_3": readings[2].aqi,
+            "aqi_mean_3": (
+                readings[0].aqi +
+                readings[1].aqi +
+                readings[2].aqi
+            ) / 3,
+        }
 
-        # Fill missing numeric values
+        df = pd.DataFrame([data])
+
         df = df.fillna(df.median(numeric_only=True))
 
-        # Ensure feature order matches training
-        features = [
-            "latitude",
-            "longitude",
-            "pm25",
-            "pm10",
-            "co",
-            "no2",
-            "so2",
-            "o3",
-            "temperature",
-            "humidity",
-            "pressure",
-            "wind_speed",
-            "wind_direction",
-            "year",
-            "month",
-            "day",
-            "hour",
-            "weekday",
-            "aqi_lag_1",
-            "aqi_lag_2",
-            "aqi_lag_3",
-            "aqi_mean_3",
+        df = df[cls.FEATURES]
+
+        prediction = float(model.predict(df)[0])
+
+        tree_predictions = [
+            tree.predict(df)[0]
+            for tree in model.estimators_
         ]
 
-        df = df[features]
+        std = np.std(tree_predictions)
 
-        prediction = model.predict(df)[0]
+        confidence = round(
+            max(50, 100 - std),
+            2
+        )
+
+        insight = AQIInsights.generate(
+            latest.aqi,
+            prediction
+        )
 
         return {
             "station": station.station_name,
             "city": station.city,
-            "current_aqi": latest.aqi,
-            "predicted_aqi": round(float(prediction), 2),
+            "current_aqi": round(float(latest.aqi), 2),
+            "predicted_aqi": round(prediction, 2),
+            "confidence": confidence,
             "prediction_for": "Next Reading",
+            "category": insight["category"],
+            "trend": insight["trend"],
+            "health_advice": insight["health_advice"],
         }

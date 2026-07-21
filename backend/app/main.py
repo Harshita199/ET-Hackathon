@@ -283,3 +283,49 @@ def predict(
         }
 
     return result
+
+from app.models.aqi_reading import AQIReading
+
+
+@app.get("/ml/history/{station_id}")
+def history(station_id: str, db: Session = Depends(get_db)):
+
+    readings = (
+        db.query(AQIReading)
+        .filter(AQIReading.station_id == station_id)
+        .order_by(AQIReading.timestamp.asc())
+        .all()
+    )
+
+    return [
+        {
+            "timestamp": r.timestamp,
+            "aqi": r.aqi
+        }
+        for r in readings
+    ]
+
+
+@app.get("/dashboard")
+def dashboard(db: Session = Depends(get_db)):
+    return DashboardService.get_dashboard(db)
+
+@app.get("/alerts")
+def alerts(db: Session = Depends(get_db)):
+    return DashboardService.alerts(db)
+
+@app.get("/top-polluted")
+def top_polluted(db: Session = Depends(get_db)):
+    return DashboardService.top_polluted(db)
+
+@app.get("/aqi-trend")
+def aqi_trend(
+    station_id: str,
+    days: int = 30,
+    db: Session = Depends(get_db)
+):
+    return DashboardService.aqi_trend(
+        db,
+        station_id,
+        days,
+    )
