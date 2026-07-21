@@ -206,3 +206,51 @@ def get_stations(
     db: Session = Depends(get_db),
 ):
     return StationQueryService.get_all(db)
+
+from app.ml.dataset_builder import DatasetBuilder
+# @app.get("/ml/dataset")
+# def ml_dataset(
+#     db: Session = Depends(get_db),
+# ):
+
+#     df = DatasetBuilder.build(db)
+
+#     return df.to_dict(orient="records")
+from fastapi.encoders import jsonable_encoder
+import pandas as pd
+import numpy as np
+
+@app.get("/ml/dataset")
+def dataset(db: Session = Depends(get_db)):
+    df = DatasetBuilder.build(db)
+
+    # Convert all NaN/Inf to None
+    df = df.replace([np.inf, -np.inf], np.nan)
+    df = df.astype(object)
+    df = df.where(pd.notnull(df), None)
+
+    records = df.to_dict(orient="records")
+
+    # FastAPI-safe JSON encoding
+    return jsonable_encoder(records)
+
+from fastapi.encoders import jsonable_encoder
+import pandas as pd
+from app.ml.feature_engineering import FeatureEngineering
+import numpy as np
+
+@app.get("/ml/features")
+def features(db: Session = Depends(get_db)):
+    df = DatasetBuilder.build(db)
+
+    # your feature engineering
+    feature_df = FeatureEngineering.transform(df)
+
+    # IMPORTANT: make JSON safe
+    feature_df = feature_df.replace([np.inf, -np.inf], np.nan)
+    feature_df = feature_df.astype(object)
+    feature_df = feature_df.where(pd.notnull(feature_df), None)
+
+    records = feature_df.to_dict(orient="records")
+
+    return jsonable_encoder(records)

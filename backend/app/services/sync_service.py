@@ -4,7 +4,8 @@ from app.ingestion.waqi import WAQIClient
 from app.services.waqi_parser import WAQIParser
 from app.services.station_service import StationService
 from app.services.aqi_reading_service import AQIReadingService
-from backend.app.services.weather_service import WeatherService
+# from backend.app.services.weather_service import WeatherService
+from app.services.weather_service import WeatherService
 
 
 class SyncService:
