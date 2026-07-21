@@ -1,69 +1,109 @@
-# 🌍 Air Quality Intelligence Platform - Frontend
+# Air Quality Intelligence Platform - Frontend Requirements
 
 ## Overview
 
-The **Air Quality Intelligence Platform Frontend** is a web-based dashboard application that provides interactive visualization and analysis of urban air quality data.
+The frontend application provides a visualization layer for the Air Quality Intelligence Platform.
 
-The frontend consumes APIs from the FastAPI backend and converts air quality data into meaningful visual insights.
+The application consumes APIs from the FastAPI backend and displays:
 
-The application helps users monitor:
-
-- Current AQI status
-- Historical AQI trends
-- Pollutant variations
-- Monitoring station details
-- ML-based AQI predictions
+- AQI monitoring dashboard
+- Monitoring stations
+- Historical air quality trends
+- ML-based AQI prediction
 - Pollution alerts
-- City-level air quality insights
+- Pollution ranking
+- Air quality insights
+
+
+# Frontend Pages & API Integration
 
 ---
 
-# Features
+# 1. Dashboard Page
 
-## 1. AQI Dashboard
+## Purpose
 
-Provides a real-time overview of air quality conditions.
+Provide an overall view of the current air quality status across monitored locations.
 
-### Displays
-
-- Current AQI value
-- AQI category
-- Air quality status
-- Pollution summary
-- Latest air quality information
-
-### Backend API
+## API
 
 ```
 GET /dashboard
 ```
 
+## UI Components
+
+### AQI Overview Cards
+
+Display:
+
+- Current average AQI
+- AQI category
+- Total monitoring stations
+- Pollution status
+
+
+### Charts
+
+Display:
+
+- AQI distribution
+- Pollution summary
+- Recent trends
+
+
+## Data Source
+
+Backend:
+
+```
+DashboardService.get_dashboard()
+```
+
 ---
 
-## 2. AQI Summary
+# 2. Summary Page
 
-Provides overall air quality statistics.
+## Purpose
 
-### Displays
+Display high-level statistics of the air quality system.
 
-- Average AQI
-- Number of monitoring stations
-- Pollution overview
-- Latest readings
-
-### Backend API
+## API
 
 ```
 GET /summary
 ```
 
+## UI Components
+
+Display:
+
+- Total stations
+- Average AQI
+- Highest AQI location
+- Lowest AQI location
+- Pollution summary
+
+
 ---
 
-## 3. Monitoring Stations
+# 3. Monitoring Stations Page
 
-Displays all available air quality monitoring stations.
+## Purpose
 
-### Displays
+Display all available AQI monitoring stations.
+
+## API
+
+```
+GET /stations
+```
+
+## UI Components
+
+### Station Table / Cards
+
+Display:
 
 - Station name
 - City
@@ -71,328 +111,392 @@ Displays all available air quality monitoring stations.
 - Latitude
 - Longitude
 
-### Backend API
+
+Example:
 
 ```
-GET /stations
+Station:
+Maninagar
+
+City:
+Ahmedabad
+
+Coordinates:
+23.012,72.589
 ```
 
-Example response:
 
-```json
-{
-  "station_name": "Maninagar",
-  "city": "Ahmedabad",
-  "latitude": 23.012,
-  "longitude": 72.589
-}
-```
+## Future Enhancement
+
+Display stations on an interactive map.
 
 ---
 
-## 4. Station AQI History
+# 4. Station Details Page
 
-Provides historical air quality analysis for individual monitoring stations.
+## Purpose
 
-### Visualizations
+Show detailed AQI information for a selected monitoring station.
 
-- AQI trend
-- PM2.5 levels
-- PM10 levels
-- CO levels
-- NO2 levels
-- SO2 levels
-- O3 levels
-- Weather parameters
+## Input
 
-### Backend API
+```
+station_id
+```
+
+
+## APIs Used
+
+### Historical Data
 
 ```
 GET /stations/{station_id}/history
 ```
 
----
 
-## 5. AQI Trend Analysis
-
-Displays AQI changes over a selected time range.
-
-### Features
-
-- Time-series AQI visualization
-- Historical pollution patterns
-- Station-based filtering
-
-### Backend API
+### AQI Trend
 
 ```
 GET /aqi-trend
 ```
 
-Parameters:
+
+## UI Components
+
+
+### AQI Trend Chart
+
+Display:
+
+- AQI over time
+- Date/time
+
+
+### Pollutant Charts
+
+Display:
+
+- PM2.5
+- PM10
+- CO
+- NO2
+- SO2
+- O3
+
+
+### Weather Information
+
+Display:
+
+- Temperature
+- Humidity
+- Wind Speed
+- Pressure
+
+
+---
+
+# 5. AQI Prediction Page
+
+## Purpose
+
+Display ML-based future AQI prediction.
+
+
+## API
+
+```
+GET /ml/predict/{station_id}
+```
+
+
+## UI Components
+
+
+### Prediction Card
+
+Display:
+
+```
+Current AQI:
+108
+
+
+Predicted AQI:
+105.48
+
+
+Confidence:
+92.36%
+
+
+Category:
+Unhealthy for Sensitive Groups
+```
+
+
+### Trend Information
+
+Display:
+
+Example:
+
+```
+Air quality is expected to remain stable.
+```
+
+
+### Health Advisory
+
+Display:
+
+Example:
+
+```
+Children, elderly and asthma patients
+should reduce outdoor activity.
+```
+
+
+---
+
+# 6. AQI History Page
+
+## Purpose
+
+Display historical AQI patterns.
+
+
+## API
+
+```
+GET /ml/history/{station_id}
+```
+
+
+## UI Components
+
+
+### Historical AQI Chart
+
+Display:
+
+- Timestamp
+- AQI value
+
+
+Example:
+
+```
+Date          AQI
+
+22-Jun        114
+23-Jun        108
+24-Jun        120
+```
+
+
+---
+
+# 7. Pollution Alerts Page
+
+## Purpose
+
+Display AQI-based warnings and recommendations.
+
+
+## API
+
+```
+GET /alerts
+```
+
+
+## UI Components
+
+
+Alert Cards:
+
+Display:
+
+- Location
+- AQI value
+- Severity
+- Recommendation
+
+
+Example:
+
+```
+⚠ High Pollution Alert
+
+Location:
+Ahmedabad
+
+AQI:
+220
+
+Recommendation:
+Avoid outdoor activities
+```
+
+
+---
+
+# 8. Top Polluted Locations Page
+
+## Purpose
+
+Display locations with highest pollution levels.
+
+
+## API
+
+```
+GET /top-polluted
+```
+
+
+## UI Components
+
+
+Ranking Table:
+
+
+```
+Rank | City | AQI
+
+1    | Delhi | 250
+2    | Kolkata | 220
+3    | Ahmedabad | 190
+```
+
+
+---
+
+# 9. AQI Trend Page
+
+## Purpose
+
+Analyze AQI movement over selected periods.
+
+
+## API
+
+```
+GET /aqi-trend
+```
+
+
+## Query Parameters
+
 
 ```
 station_id
 days
 ```
 
+
 Example:
 
 ```
-GET /aqi-trend?station_id=<station_id>&days=30
+/aqi-trend?station_id=abc&days=30
 ```
 
----
 
-## 6. ML-Based AQI Prediction
+## UI Components
 
-Displays future AQI prediction generated by the machine learning model.
 
-### Displays
+Display:
 
-- Current AQI
-- Predicted AQI
-- Prediction confidence
-- AQI category
+- Line chart
+- Date range filter
 - AQI trend
-- Health recommendations
 
-
-### Backend API
-
-```
-GET /ml/predict/{station_id}
-```
-
-Example response:
-
-```json
-{
-  "station": "Maninagar, Ahmedabad, India",
-  "current_aqi": 108,
-  "predicted_aqi": 105.48,
-  "confidence": 92.36,
-  "category": "Unhealthy for Sensitive Groups",
-  "trend": "Air quality is expected to remain stable.",
-  "health_advice": "Children, elderly and asthma patients should reduce outdoor activity."
-}
-```
 
 ---
 
-## 7. Pollution Alerts
+# Frontend Navigation Structure
 
-Displays AQI warnings and health recommendations.
-
-### Displays
-
-- High AQI areas
-- Pollution alerts
-- Health advisory messages
-
-
-### Backend API
 
 ```
-GET /alerts
+Application
+
+|
+|-- Dashboard
+|
+|-- Stations
+|      |
+|      |-- Station Details
+|
+|-- AQI Prediction
+|
+|-- AQI Trends
+|
+|-- Alerts
+|
+|-- Top Polluted Locations
+
 ```
+
 
 ---
 
-## 8. Top Polluted Locations
-
-Displays locations with higher pollution levels.
-
-### Displays
-
-- Pollution ranking
-- AQI comparison
-- Most affected locations
+# API Configuration
 
 
-### Backend API
-
-```
-GET /top-polluted
-```
-
----
-
-# Frontend Architecture
-
-```
-                    User
-                      |
-                      |
-              React Frontend
-                      |
-        --------------------------------
-        |              |               |
-    Dashboard       Charts        Prediction
-    Components    Components     Components
-                      |
-                      |
-              API Service Layer
-                      |
-                      |
-              FastAPI Backend
-                      |
-                      |
-                  Neon Database
-```
-
----
-
-# Technology Stack
-
-## Frontend Framework
-
-- React.js
-
-## UI Framework
-
-- Material UI / Tailwind CSS
-
-## API Communication
-
-- Axios
-
-## Data Visualization
-
-- Recharts
-- Apache ECharts
-
-## Mapping (Future Enhancement)
-
-- Leaflet
-- Mapbox
-
----
-
-# Project Structure
-
-```
-src/
-
-├── api/
-│   └── apiClient.js
-│
-├── components/
-│
-│   ├── AQICard.jsx
-│   ├── TrendChart.jsx
-│   ├── StationCard.jsx
-│   ├── PredictionCard.jsx
-│   └── AlertCard.jsx
-│
-├── pages/
-│
-│   ├── Dashboard.jsx
-│   ├── StationDetails.jsx
-│   ├── Prediction.jsx
-│   └── Alerts.jsx
-│
-├── hooks/
-│
-├── utils/
-│
-├── styles/
-│
-└── App.jsx
-```
-
----
-
-# Backend Integration
-
-Backend URL:
+Backend Base URL:
 
 ```
 http://localhost:8000
 ```
 
-Environment Configuration:
 
-`.env`
+Environment Variable:
 
-```env
+
+```
 VITE_API_URL=http://localhost:8000
 ```
 
-Example API call:
-
-```javascript
-axios.get(
- `${API_URL}/ml/predict/${stationId}`
-)
-```
 
 ---
 
-# Running the Frontend
+# API Summary
 
-## Install Dependencies
 
-```bash
-npm install
-```
-
-## Start Development Server
-
-```bash
-npm run dev
-```
-
-Application will be available at:
-
-```
-http://localhost:5173
-```
-
----
-
-# Current Implementation Status
-
-## Completed
-
-✅ AQI Dashboard  
-✅ AQI Summary View  
-✅ Monitoring Station View  
-✅ Historical AQI Charts  
-✅ Pollutant Visualization  
-✅ ML Prediction Visualization  
-✅ Pollution Alerts  
-✅ Top Polluted Locations  
+| Feature | API |
+|---|---|
+| Dashboard | GET /dashboard |
+| Summary | GET /summary |
+| Stations | GET /stations |
+| Station History | GET /stations/{station_id}/history |
+| AQI Trend | GET /aqi-trend |
+| AQI Prediction | GET /ml/predict/{station_id} |
+| AQI History | GET /ml/history/{station_id} |
+| Alerts | GET /alerts |
+| Top Polluted | GET /top-polluted |
 
 
 ---
 
-# Future Enhancements
+# Future Frontend Enhancements
 
-## Geospatial Intelligence
+## Geospatial Dashboard
 
-- Interactive AQI heatmap
+- AQI heatmap
+- Station markers
 - Pollution hotspot visualization
-- Monitoring station map
-- Ward-level AQI visualization
 
 
-## AI Intelligence Layer
+## AI Insights
 
-- LLM-powered AQI assistant
-- Natural language pollution explanations
-- Automated environmental reports
+- LLM-generated AQI explanations
+- Natural language queries
 
 
 ## Advanced Analytics
 
 - Pollution source attribution
-- Weather correlation analysis
-- Multi-city comparison dashboard
-
-
----
-
-# Vision
-
-The frontend will evolve into an AI-powered environmental intelligence dashboard that enables proactive air quality monitoring, prediction, and decision-making for smart cities.
+- Weather impact analysis
+- Multi-city comparison
