@@ -1,357 +1,1668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Air Quality Intelligence Platform</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg: #0f172a; --panel: #1e293b; --panel2: #334155;
-      --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --border: #334155;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg); color: var(--text);
-    }
-    header {
-      background: var(--panel); padding: 14px 20px; border-bottom: 1px solid var(--border);
-    }
-    header h1 { margin: 0 0 10px; font-size: 18px; }
-    nav { display: flex; flex-wrap: wrap; gap: 6px; }
-    nav button {
-      background: var(--panel2); color: var(--text); border: 1px solid var(--border);
-      padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;
-    }
-    nav button:hover { border-color: var(--accent); }
-    nav button.active { background: var(--accent); color: #0f172a; font-weight: 600; }
-    main { padding: 20px; max-width: 1100px; margin: 0 auto; }
-    section { display: none; }
-    section.active { display: block; }
-    h2 { font-size: 20px; margin-top: 0; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .card {
-      background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
-    }
-    .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
-    .card .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 10px; overflow: hidden; }
-    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-    th { color: var(--muted); text-transform: uppercase; font-size: 11px; letter-spacing: .5px; }
-    tr:last-child td { border-bottom: none; }
-    button.link { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-    .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-    select, input {
-      background: var(--panel); color: var(--text); border: 1px solid var(--border);
-      padding: 8px; border-radius: 6px; font-size: 14px;
-    }
-    input[type=number] { width: 90px; }
-    .alert { border-left: 4px solid #ef4444; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-    .muted { color: var(--muted); }
-    .error { color: #f87171; }
-    canvas { background: var(--panel); border-radius: 10px; padding: 10px; margin-top: 12px; }
-    .subhead { margin: 20px 0 8px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>
+Air Quality Intelligence Platform
+</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link 
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+:root {
+
+--bg:#0f172a;
+--panel:#1e293b;
+--panel2:#334155;
+--text:#e2e8f0;
+--muted:#94a3b8;
+--accent:#38bdf8;
+--border:#334155;
+
+}
+
+
+*{
+box-sizing:border-box;
+}
+body{
+
+margin:0;
+
+font-family:
+system-ui,
+-apple-system,
+Segoe UI,
+Roboto,
+sans-serif;
+
+background:var(--bg);
+
+color:var(--text);
+
+}
+
+
+
+header{
+
+background:var(--panel);
+
+padding:15px 20px;
+
+border-bottom:1px solid var(--border);
+
+}
+header h1{
+
+margin:0 0 10px;
+
+font-size:20px;
+
+}
+
+
+
+nav{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:6px;
+
+}
+nav button{
+
+
+background:var(--panel2);
+
+color:var(--text);
+
+border:1px solid var(--border);
+
+padding:7px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-size:13px;
+
+
+}
+
+
+nav button:hover{
+
+border-color:var(--accent);
+
+}
+
+
+nav button.active{
+
+background:var(--accent);
+
+color:#0f172a;
+
+font-weight:600;
+
+}
+
+
+
+main{
+
+padding:20px;
+
+max-width:1200px;
+
+margin:auto;
+
+}
+section{
+display:none;
+}
+section.active{
+
+display:block;
+
+}
+h2{
+font-size:22px;
+margin-top:0;
+}
+.cards{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(180px,1fr));
+gap:12px;
+}
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:10px;
+padding:16px;
+}
+.card .label{
+color:var(--muted);
+
+font-size:12px;
+
+text-transform:uppercase;
+
+}
+
+
+.card .value{
+
+font-size:25px;
+
+font-weight:700;
+
+margin-top:5px;
+
+}
+
+
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:var(--panel);
+
+border-radius:10px;
+
+overflow:hidden;
+
+}
+
+
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid var(--border);
+
+font-size:14px;
+
+}
+
+
+
+th{
+
+color:var(--muted);
+
+font-size:12px;
+
+text-transform:uppercase;
+
+}
+
+
+
+.controls{
+
+display:flex;
+
+gap:10px;
+
+margin-bottom:15px;
+
+flex-wrap:wrap;
+
+}
+
+
+
+select,input{
+
+background:var(--panel);
+
+color:var(--text);
+
+border:1px solid var(--border);
+
+padding:8px;
+
+border-radius:6px;
+
+}
+
+
+
+button.link{
+
+background:none;
+
+border:1px solid var(--accent);
+
+color:var(--accent);
+
+padding:6px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+
+
+canvas{
+
+background:var(--panel);
+
+border-radius:10px;
+
+padding:10px;
+
+}
+
+
+
+.muted{
+
+color:var(--muted);
+
+}
+
+
+
+.error{
+
+color:#f87171;
+
+}
+
+
+
+.alert{
+
+border-left:4px solid #ef4444;
+
+}
+
+
+
+.subhead{
+
+margin:20px 0 8px;
+
+color:var(--muted);
+
+text-transform:uppercase;
+
+font-size:13px;
+
+}
+
+
+
+#aqi-map{
+
+height:500px;
+
+border-radius:10px;
+
+margin-top:15px;
+
+}
+
+
+
+.ai-section{
+
+
+background:var(--panel);
+
+border:1px solid var(--border);
+
+border-radius:10px;
+
+padding:15px;
+
+margin-bottom:12px;
+
+
+}
+
+
+
+.ai-title{
+
+color:var(--accent);
+
+font-weight:600;
+
+margin-bottom:8px;
+
+}
+
+
+
+.action-item{
+
+padding:8px;
+
+border-bottom:1px solid var(--border);
+
+}
+
+
+
+</style>
+
+
 </head>
+
+
+
 <body>
-  <header>
-    <h1>Air Quality Intelligence Platform</h1>
-    <nav id="nav"></nav>
-  </header>
-  <main>
-    <section id="dashboard"><h2>Dashboard</h2><div id="dashboard-body" class="muted">Loading…</div></section>
-    <section id="summary"><h2>Summary</h2><div id="summary-body" class="muted">Loading…</div></section>
-    <section id="stations"><h2>Monitoring Stations</h2><div id="stations-body" class="muted">Loading…</div></section>
-    <section id="details">
-      <h2>Station Details</h2>
-      <div class="controls">
-        <select id="details-select"></select>
-      </div>
-      <div id="details-body" class="muted">Select a station.</div>
-    </section>
-    <section id="prediction">
-      <h2>AQI Prediction</h2>
-      <div class="controls"><select id="prediction-select"></select></div>
-      <div id="prediction-body" class="muted">Select a station.</div>
-    </section>
-    <section id="trend">
-      <h2>AQI Trend</h2>
-      <div class="controls">
-        <select id="trend-select"></select>
-        <label>Days <input type="number" id="trend-days" value="30" min="1" /></label>
-        <button class="link" id="trend-go">Load</button>
-      </div>
-      <div id="trend-body" class="muted">Select a station.</div>
-      <canvas id="trend-chart" height="120"></canvas>
-    </section>
-    <section id="history">
-      <h2>AQI History</h2>
-      <div class="controls"><select id="history-select"></select></div>
-      <div id="history-body" class="muted">Select a station.</div>
-      <canvas id="history-chart" height="120"></canvas>
-    </section>
-    <section id="alerts"><h2>Pollution Alerts</h2><div id="alerts-body" class="muted">Loading…</div></section>
-    <section id="top"><h2>Top Polluted Locations</h2><div id="top-body" class="muted">Loading…</div></section>
-  </main>
 
-  <script>
-    const API = "http://localhost:8000";
 
-    async function api(path) {
-      const r = await fetch(API + path);
-      if (!r.ok) throw new Error(r.status + " " + r.statusText);
-      return r.json();
+
+<header>
+
+
+<h1>
+Air Quality Intelligence Platform
+</h1>
+
+
+<nav id="nav"></nav>
+
+
+</header>
+
+
+
+<main>
+
+
+
+<!-- Dashboard -->
+
+<section id="dashboard">
+
+<h2>Dashboard</h2>
+
+<div id="dashboard-body" class="muted">
+Loading...
+</div>
+
+</section>
+
+
+
+
+<!-- MAP -->
+
+<section id="map">
+
+
+<h2>
+AQI Geospatial Map
+</h2>
+
+
+<div id="aqi-map"></div>
+
+
+</section>
+<!-- Summary -->
+
+
+<section id="summary">
+
+<h2>
+Summary
+</h2>
+
+<div id="summary-body" class="muted">
+Loading...
+</div>
+
+</section>
+<!-- Stations -->
+
+
+<section id="stations">
+
+<h2>
+Monitoring Stations
+</h2>
+
+<div id="stations-body" class="muted">
+Loading...
+</div>
+
+
+</section>
+
+<!-- Details -->
+
+
+<section id="details">
+
+
+<h2>
+Station Details
+</h2>
+
+
+<div class="controls">
+
+<select id="details-select">
+
+</select>
+
+</div>
+
+<div id="details-body" class="muted">
+Select station
+</div>
+</section>
+<!-- Prediction -->
+<section id="prediction">
+<h2>
+AQI Prediction
+</h2>
+<div class="controls">
+<select id="prediction-select"></select>
+</div>
+<div id="prediction-body" class="muted">
+Select station
+</div>
+</section>
+<!-- Trend -->
+<section id="trend">
+<h2>
+AQI Trend
+</h2>
+<div class="controls">
+<select id="trend-select"></select>
+<label>
+Days
+<input 
+type="number"
+id="trend-days"
+value="30"
+/>
+</label>
+<button class="link" id="trend-go">
+Load
+</button>
+</div>
+<div id="trend-body"></div>
+<canvas id="trend-chart" height="120"></canvas>
+</section>
+
+<!-- History -->
+<section id="history">
+<h2>
+AQI History
+</h2>
+<div class="controls">
+<select id="history-select"></select>
+</div>
+<div id="history-body"></div>
+<canvas id="history-chart" height="120"></canvas>
+
+</section>
+
+
+<!-- Alerts -->
+
+
+<section id="alerts">
+
+<h2>
+Pollution Alerts
+</h2>
+
+<div id="alerts-body"></div>
+</section>
+<!-- Top polluted -->
+<section id="top">
+<h2>
+Top Polluted Locations
+</h2>
+<div id="top-body"></div>
+</section>
+<!-- AI -->
+<section id="ai">
+<h2>
+AI Environmental Intelligence
+</h2>
+<div class="controls">
+<select id="ai-select"></select>
+<button class="link" id="ai-load">
+Analyze
+</button>
+</div>
+<div id="ai-body">
+Select station
+</div>
+</section>
+<!-- Sources -->
+<section id="sources">
+<h2>
+Pollution Source Attribution
+</h2>
+<div class="controls">
+<select id="source-select"></select>
+<button class="link" id="source-load">
+Analyze
+</button>
+</div>
+<div class="card">
+<canvas id="source-chart"></canvas>
+</div>
+</section>
+<!-- Enforcement -->
+<section id="enforcement">
+<h2>
+Enforcement Recommendation
+</h2>
+<div class="controls">
+<select id="enforcement-select"></select>
+<button class="link" id="enforcement-load">
+Generate
+</button>
+</div>
+<div id="enforcement-body"></div>
+</section>
+<!-- Risk -->
+<section id="risk">
+<h2>
+City Risk Intelligence
+</h2>
+
+<div id="risk-body">
+Loading...
+</div>
+</section>
+</main>
+<script>
+
+
+const API = "http://localhost:8000";
+
+
+async function api(path){
+
+    const response = await fetch(API + path);
+
+    if(!response.ok){
+
+        throw new Error(
+            response.status + " " + response.statusText
+        );
+
     }
 
-    const PAGES = [
-      ["dashboard", "Dashboard"], ["summary", "Summary"], ["stations", "Stations"],
-      ["details", "Station Details"], ["prediction", "Prediction"], ["trend", "AQI Trend"],
-      ["history", "AQI History"], ["alerts", "Alerts"], ["top", "Top Polluted"],
-    ];
+    return response.json();
 
-    const loaded = {};        // pages loaded once
-    let stationsCache = null; // shared /stations result
+}
+const el = id => document.getElementById(id);
 
-    // ---- helpers ----
-    const el = (id) => document.getElementById(id);
-    const esc = (s) => String(s ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-    const num = (v, d = 2) => (v === null || v === undefined) ? "—" : Number(v).toFixed(d);
-    const fmtTime = (t) => t ? String(t).replace("T", " ").slice(0, 16) : "—";
-    function fail(node, e) { node.innerHTML = `<p class="error">Failed to load: ${esc(e.message)}</p>`; }
 
-    function card(label, value) {
-      return `<div class="card"><div class="label">${label}</div><div class="value">${value}</div></div>`;
-    }
+const esc = value =>
+String(value ?? "")
+.replace(/[&<>]/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;"
+}[c]));
 
-    async function getStations() {
-      if (!stationsCache) stationsCache = await api("/stations");
-      return stationsCache;
-    }
 
-    async function fillSelect(select, includeBlank) {
-      const stations = await getStations();
-      const opts = stations.map(s =>
-        `<option value="${esc(s.id)}">${esc(s.station_name)} — ${esc(s.city)}</option>`).join("");
-      select.innerHTML = (includeBlank ? '<option value="">Select a station…</option>' : "") + opts;
-    }
 
-    // ---- navigation ----
-    const nav = el("nav");
-    PAGES.forEach(([id, label]) => {
-      const b = document.createElement("button");
-      b.textContent = label;
-      b.dataset.page = id;
-      b.onclick = () => go(id);
-      nav.appendChild(b);
-    });
+const num = (v,d=2)=>
+(v===null || v===undefined)
+?
+"—"
+:
+Number(v).toFixed(d);
+function card(label,value){
 
-    function go(id, opts = {}) {
-      document.querySelectorAll("section").forEach(s => s.classList.toggle("active", s.id === id));
-      nav.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.page === id));
-      loaders[id] && loaders[id](opts);
-    }
+return `
 
-    // ---- page loaders ----
-    const loaders = {
-      async dashboard() {
-        if (loaded.dashboard) return; loaded.dashboard = true;
-        const b = el("dashboard-body");
-        try {
-          const d = await api("/dashboard");
-          if (!d || !Object.keys(d).length) { b.innerHTML = '<p class="muted">No data available. Run a sync first.</p>'; return; }
-          b.innerHTML = `<div class="cards">
-            ${card("Average AQI", num(d.average_aqi))}
-            ${card("Total Stations", d.total_stations ?? "—")}
-            ${card("Cities", d.cities ?? "—")}
-            ${card("Worst Station", esc(d.worst_station))}
-            ${card("Worst City", esc(d.worst_city))}
-            ${card("Worst AQI", d.worst_aqi ?? "—")}
-            ${card("Good Air Stations", d.good_air_stations ?? "—")}
-            ${card("Moderate Air Stations", d.moderate_air_stations ?? "—")}
-            ${card("Poor Air Stations", d.poor_air_stations ?? "—")}
-          </div>`;
-        } catch (e) { loaded.dashboard = false; fail(b, e); }
-      },
+<div class="card">
 
-      async summary() {
-        if (loaded.summary) return; loaded.summary = true;
-        const b = el("summary-body");
-        try {
-          const d = await api("/summary");
-          b.innerHTML = `<div class="cards">
-            ${card("Total Stations", d.stations ?? "—")}
-            ${card("Average AQI", num(d.average_aqi))}
-            ${card("Good", d.good ?? "—")}
-            ${card("Moderate", d.moderate ?? "—")}
-            ${card("Poor", d.poor ?? "—")}
-            ${card("Very Poor", d.very_poor ?? "—")}
-            ${card("Severe", d.severe ?? "—")}
-          </div>`;
-        } catch (e) { loaded.summary = false; fail(b, e); }
-      },
+<div class="label">
+${label}
+</div>
 
-      async stations() {
-        if (loaded.stations) return; loaded.stations = true;
-        const b = el("stations-body");
-        try {
-          const rows = await getStations();
-          if (!rows.length) { b.innerHTML = '<p class="muted">No stations found.</p>'; return; }
-          b.innerHTML = `<table><thead><tr>
-            <th>Station</th><th>City</th><th>State</th><th>Coordinates</th><th>AQI</th><th></th>
-          </tr></thead><tbody>${rows.map(s => `<tr>
-            <td>${esc(s.station_name)}</td><td>${esc(s.city)}</td><td>${esc(s.state)}</td>
-            <td class="muted">${num(s.latitude, 3)}, ${num(s.longitude, 3)}</td>
-            <td>${s.aqi ?? "—"}</td>
-            <td><button class="link" onclick="openDetails('${esc(s.id)}')">Details</button></td>
-          </tr>`).join("")}</tbody></table>`;
-        } catch (e) { loaded.stations = false; fail(b, e); }
-      },
+<div class="value">
+${value}
+</div>
 
-      async details(opts) {
-        const sel = el("details-select");
-        if (!loaded.details) { loaded.details = true; try { await fillSelect(sel, true); } catch (e) { return fail(el("details-body"), e); }
-          sel.onchange = () => renderDetails(sel.value); }
-        if (opts.stationId) { sel.value = opts.stationId; renderDetails(opts.stationId); }
-      },
+</div>
 
-      async prediction() {
-        const sel = el("prediction-select");
-        if (loaded.prediction) return; loaded.prediction = true;
-        try { await fillSelect(sel, true); } catch (e) { return fail(el("prediction-body"), e); }
-        sel.onchange = () => renderPrediction(sel.value);
-      },
+`;
 
-      async trend() {
-        const sel = el("trend-select");
-        if (loaded.trend) return; loaded.trend = true;
-        try { await fillSelect(sel, true); } catch (e) { return fail(el("trend-body"), e); }
-        el("trend-go").onclick = () => renderTrend(sel.value, el("trend-days").value);
-      },
+}
 
-      async history() {
-        const sel = el("history-select");
-        if (loaded.history) return; loaded.history = true;
-        try { await fillSelect(sel, true); } catch (e) { return fail(el("history-body"), e); }
-        sel.onchange = () => renderHistory(sel.value);
-      },
+const PAGES=[
+["dashboard","Dashboard"],
+["map","AQI Map"],
+["summary","Summary"],
+["stations","Stations"],
+["details","Details"],
+["prediction","Prediction"],
+["trend","Trend"],
+["history","History"],
+["alerts","Alerts"],
+["top","Top Polluted"],
+["ai","AI Insights"],
+["sources","Sources"],
+["enforcement","Enforcement"],
+["risk","City Risk"]
+];
+const nav=el("nav");
+PAGES.forEach(([id,name])=>{
+let btn=document.createElement("button");
+btn.innerText=name;
+btn.dataset.page=id;
+btn.onclick=()=>go(id);
+nav.appendChild(btn);
+});
 
-      async alerts() {
-        if (loaded.alerts) return; loaded.alerts = true;
-        const b = el("alerts-body");
-        try {
-          const rows = await api("/alerts");
-          if (!rows.length) { b.innerHTML = '<p class="muted">No active alerts.</p>'; return; }
-          b.innerHTML = `<div class="cards">${rows.map(a => `<div class="card alert">
-            <div class="label">⚠ ${esc(a.severity)}</div>
-            <div class="value">${a.aqi}</div>
-            <div>${esc(a.station)}</div>
-            <div class="muted">${esc(a.city)}</div>
-          </div>`).join("")}</div>`;
-        } catch (e) { loaded.alerts = false; fail(b, e); }
-      },
+const loaded={};
 
-      async top() {
-        if (loaded.top) return; loaded.top = true;
-        const b = el("top-body");
-        try {
-          const rows = await api("/top-polluted");
-          if (!rows.length) { b.innerHTML = '<p class="muted">No data available.</p>'; return; }
-          b.innerHTML = `<table><thead><tr><th>Rank</th><th>City</th><th>Station</th><th>AQI</th></tr></thead>
-            <tbody>${rows.map((r, i) => `<tr>
-              <td>${i + 1}</td><td>${esc(r.city)}</td><td>${esc(r.station)}</td><td>${r.aqi}</td>
-            </tr>`).join("")}</tbody></table>`;
-        } catch (e) { loaded.top = false; fail(b, e); }
-      },
-    };
 
-    // ---- detail renderers (triggered by selection) ----
-    function openDetails(id) { go("details", { stationId: id }); }
+function go(id,opts={}){
 
-    async function renderDetails(id) {
-      const b = el("details-body");
-      if (!id) { b.innerHTML = '<p class="muted">Select a station.</p>'; return; }
-      b.innerHTML = '<p class="muted">Loading…</p>';
-      try {
-        const hist = await api(`/stations/${id}/history`);
-        if (!hist.length) { b.innerHTML = '<p class="muted">No readings for this station.</p>'; return; }
-        const latest = hist[0];
-        const pollutants = [["PM2.5", latest.pm25], ["PM10", latest.pm10], ["CO", latest.co],
-          ["NO2", latest.no2], ["SO2", latest.so2], ["O3", latest.o3]];
-        const weather = [["Temperature", latest.temperature], ["Humidity", latest.humidity],
-          ["Wind Speed", latest.wind_speed], ["Pressure", latest.pressure]];
-        b.innerHTML = `
-          <div class="subhead">Latest reading — ${fmtTime(latest.timestamp)} · AQI ${latest.aqi ?? "—"}</div>
-          <div class="subhead">Pollutants</div>
-          <div class="cards">${pollutants.map(([k, v]) => card(k, num(v))).join("")}</div>
-          <div class="subhead">Weather</div>
-          <div class="cards">${weather.map(([k, v]) => card(k, num(v))).join("")}</div>
-          <div class="subhead">History</div>
-          <table><thead><tr><th>Time</th><th>AQI</th><th>PM2.5</th><th>PM10</th></tr></thead>
-          <tbody>${hist.map(r => `<tr><td>${fmtTime(r.timestamp)}</td><td>${r.aqi ?? "—"}</td>
-            <td>${num(r.pm25)}</td><td>${num(r.pm10)}</td></tr>`).join("")}</tbody></table>`;
-      } catch (e) { fail(b, e); }
-    }
 
-    async function renderPrediction(id) {
-      const b = el("prediction-body");
-      if (!id) { b.innerHTML = '<p class="muted">Select a station.</p>'; return; }
-      b.innerHTML = '<p class="muted">Loading…</p>';
-      try {
-        const d = await api(`/ml/predict/${id}`);
-        if (d.error || d.status === "failed") {
-          b.innerHTML = `<p class="error">${esc(d.error || d.message)}</p>`; return;
-        }
-        b.innerHTML = `<div class="cards">
-          ${card("Current AQI", num(d.current_aqi))}
-          ${card("Predicted AQI", num(d.predicted_aqi))}
-          ${card("Confidence", num(d.confidence) + "%")}
-          ${card("Category", esc(d.category))}
-        </div>
-        <div class="subhead">Trend (${esc(d.prediction_for)})</div>
-        <div class="card">${esc(d.trend)}</div>
-        <div class="subhead">Health Advisory</div>
-        <div class="card">${esc(d.health_advice)}</div>`;
-      } catch (e) { fail(b, e); }
-    }
+document
+.querySelectorAll("section")
+.forEach(
+s=>s.classList.toggle(
+"active",
+s.id===id
+)
+);
 
-    let trendChart, historyChart;
-    function lineChart(canvasId, existing, labels, data, label) {
-      if (existing) existing.destroy();
-      return new Chart(el(canvasId), {
-        type: "line",
-        data: { labels, datasets: [{ label, data, borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,.15)", fill: true, tension: .3 }] },
-        options: { scales: { x: { ticks: { color: "#94a3b8" } }, y: { ticks: { color: "#94a3b8" } } }, plugins: { legend: { labels: { color: "#e2e8f0" } } } },
-      });
-    }
 
-    async function renderTrend(id, days) {
-      const b = el("trend-body");
-      if (!id) { b.innerHTML = '<p class="muted">Select a station.</p>'; return; }
-      b.innerHTML = '<p class="muted">Loading…</p>';
-      try {
-        const rows = await api(`/aqi-trend?station_id=${encodeURIComponent(id)}&days=${encodeURIComponent(days || 30)}`);
-        if (!rows.length) { b.innerHTML = '<p class="muted">No data for this period.</p>'; if (trendChart) trendChart.destroy(); return; }
-        b.innerHTML = `<p class="muted">${rows.length} readings.</p>`;
-        trendChart = lineChart("trend-chart", trendChart, rows.map(r => fmtTime(r.timestamp)), rows.map(r => r.aqi), "AQI");
-      } catch (e) { fail(b, e); }
-    }
 
-    async function renderHistory(id) {
-      const b = el("history-body");
-      if (!id) { b.innerHTML = '<p class="muted">Select a station.</p>'; return; }
-      b.innerHTML = '<p class="muted">Loading…</p>';
-      try {
-        const rows = await api(`/ml/history/${id}`);
-        if (!rows.length) { b.innerHTML = '<p class="muted">No history.</p>'; if (historyChart) historyChart.destroy(); return; }
-        b.innerHTML = `<p class="muted">${rows.length} readings.</p>`;
-        historyChart = lineChart("history-chart", historyChart, rows.map(r => fmtTime(r.timestamp)), rows.map(r => r.aqi), "AQI");
-      } catch (e) { fail(b, e); }
-    }
+document
+.querySelectorAll("nav button")
+.forEach(
+b=>b.classList.toggle(
+"active",
+b.dataset.page===id
+)
+);
 
-    // start
-    go("dashboard");
-  </script>
+
+
+if(loaders[id])
+
+loaders[id](opts);
+
+
+
+}
+
+let stationsCache=null;
+async function getStations(){
+
+
+if(!stationsCache)
+
+stationsCache =
+await api("/stations");
+
+
+return stationsCache;
+
+
+}
+
+
+
+async function fillSelect(select){
+
+
+const stations =
+await getStations();
+
+
+
+select.innerHTML =
+`
+<option value="">
+Select station
+</option>
+`
++
+stations.map(
+s=>
+`
+
+<option value="${s.id}">
+${esc(s.station_name)} - ${esc(s.city)}
+</option>
+
+`
+).join("");
+
+
+
+}
+
+const loaders={
+
+async dashboard(){
+
+
+if(loaded.dashboard)
+return;
+
+
+loaded.dashboard=true;
+
+
+let d =
+await api("/dashboard");
+
+
+
+el("dashboard-body").innerHTML=
+
+
+`
+
+<div class="cards">
+
+${card(
+"Average AQI",
+num(d.average_aqi)
+)}
+
+
+${card(
+"Stations",
+d.total_stations
+)}
+
+
+
+${card(
+"Cities",
+d.cities
+)}
+
+
+${card(
+"Worst City",
+d.worst_city
+)}
+
+
+${card(
+"Worst AQI",
+d.worst_aqi
+)}
+
+
+
+</div>
+
+`;
+
+},
+
+async summary(){
+
+
+if(loaded.summary)
+return;
+
+
+loaded.summary=true;
+
+
+let d =
+await api("/summary");
+
+
+
+el("summary-body").innerHTML=
+
+
+`
+
+<div class="cards">
+
+${card("Stations",d.stations)}
+
+${card("Average AQI",num(d.average_aqi))}
+
+${card("Good",d.good)}
+
+${card("Moderate",d.moderate)}
+
+${card("Poor",d.poor)}
+
+${card("Very Poor",d.very_poor)}
+
+${card("Severe",d.severe)}
+
+
+</div>
+
+`;
+
+},
+
+
+async stations(){
+
+
+if(loaded.stations)
+return;
+
+
+loaded.stations=true;
+
+
+
+let rows =
+await getStations();
+
+
+
+el("stations-body").innerHTML=
+
+`
+
+<table>
+
+<tr>
+
+<th>Station</th>
+<th>City</th>
+<th>AQI</th>
+<th></th>
+
+</tr>
+
+
+${
+rows.map(
+s=>
+`
+
+<tr>
+
+<td>${esc(s.station_name)}</td>
+
+<td>${esc(s.city)}</td>
+
+<td>${s.aqi ?? "-"}</td>
+
+
+<td>
+
+<button class="link"
+onclick="openDetails('${s.id}')">
+
+Details
+
+</button>
+
+
+</td>
+
+</tr>
+
+
+`
+).join("")
+}
+
+
+</table>
+
+`;
+
+},
+
+async details(opts={}){
+
+
+let sel=el("details-select");
+
+
+if(!loaded.details){
+
+
+loaded.details=true;
+
+
+await fillSelect(sel);
+
+
+
+sel.onchange=()=>loadDetails(sel.value);
+
+
+}
+
+
+if(opts.stationId){
+sel.value=opts.stationId;
+loadDetails(opts.stationId);
+}
+
+
+},
+
+
+async prediction(){
+
+
+let sel=el("prediction-select");
+
+
+if(!loaded.prediction){
+
+
+loaded.prediction=true;
+
+
+await fillSelect(sel);
+
+
+sel.onchange=()=>loadPrediction(sel.value);
+
+
+
+}
+
+
+},
+
+
+async trend(){
+
+
+let sel=el("trend-select");
+
+
+if(!loaded.trend){
+
+
+loaded.trend=true;
+
+
+await fillSelect(sel);
+
+
+el("trend-go").onclick=()=>{
+
+loadTrend(
+sel.value,
+el("trend-days").value
+);
+
+
+};
+
+
+}
+
+
+},
+
+
+async history(){
+
+
+let sel=el("history-select");
+
+
+if(!loaded.history){
+
+
+loaded.history=true;
+
+
+await fillSelect(sel);
+
+
+sel.onchange=()=>loadHistory(sel.value);
+
+
+
+}
+
+},
+
+async alerts(){
+
+
+if(loaded.alerts)
+return;
+
+
+loaded.alerts=true;
+
+
+
+let data =
+await api("/alerts");
+
+
+
+el("alerts-body").innerHTML=
+
+
+data.map(
+a=>
+`
+
+<div class="card alert">
+
+<h3>
+${a.severity}
+</h3>
+
+
+AQI :
+${a.aqi}
+
+
+<br>
+
+${a.station}
+
+
+</div>
+
+
+`
+).join("");
+
+
+
+},
+
+async top(){
+
+
+if(loaded.top)
+return;
+
+
+loaded.top=true;
+
+
+let data=
+await api("/top-polluted");
+
+el("top-body").innerHTML=
+
+`
+
+<table>
+
+
+<tr>
+
+<th>Rank</th>
+<th>City</th>
+<th>Station</th>
+<th>AQI</th>
+
+</tr>
+
+
+${
+data.map(
+(r,i)=>
+`
+
+<tr>
+
+<td>${i+1}</td>
+
+<td>${r.city}</td>
+
+<td>${r.station}</td>
+
+<td>${r.aqi}</td>
+
+</tr>
+
+`
+).join("")
+}
+
+
+</table>
+
+`;
+
+}
+
+
+};
+let map;
+async function loadMap(){
+
+
+if(map)
+return;
+
+
+map = L.map("aqi-map").setView(
+[22.9734,78.6569],
+5
+);
+
+
+
+L.tileLayer(
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+    attribution:"OpenStreetMap"
+}
+).addTo(map);
+
+
+
+const data =
+await api("/geospatial/hotspots");
+
+
+
+data.forEach(point=>{
+
+
+let color =
+point.marker_color || "orange";
+
+
+
+let marker =
+L.circleMarker(
+[
+point.latitude,
+point.longitude
+],
+{
+radius:10,
+color:color
+}
+);
+
+
+
+marker.bindPopup(
+
+`
+
+<b>${point.station}</b>
+<br>
+
+City: ${point.city}
+
+<br>
+
+AQI:
+${point.aqi}
+
+<br>
+
+Category:
+${point.category}
+
+`
+
+);
+
+
+
+marker.addTo(map);
+
+
+
+});
+
+
+
+}
+
+
+async function loadAI(){
+
+
+let id =
+document.getElementById(
+"ai-select"
+).value;
+
+
+
+if(!id)
+return;
+
+
+
+let data =
+await api(
+`/ai-insights?station_id=${id}`
+);
+
+
+
+let ai =
+data.llm_insights;
+
+
+
+let html="";
+
+
+
+if(typeof ai==="object"){
+
+
+Object.keys(ai).forEach(k=>{
+
+
+html +=
+
+`
+
+<div class="ai-section">
+
+
+<div class="ai-title">
+
+${k.replaceAll("_"," ").toUpperCase()}
+
+</div>
+
+
+<div>
+
+${ai[k]}
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+}
+else{
+
+
+html =
+
+`
+
+<div class="ai-section">
+
+${ai}
+
+</div>
+
+`;
+
+}
+
+
+
+document.getElementById(
+"ai-body"
+).innerHTML=html;
+
+
+}
+
+let sourceChart;
+
+async function loadSources(){
+let id =
+document.getElementById(
+"source-select"
+).value;
+
+if(!id)
+return;
+
+let data =
+await api(
+`/source-attribution?station_id=${id}`
+);
+
+let ctx =
+document
+.getElementById(
+"source-chart"
+);
+
+if(sourceChart)
+sourceChart.destroy();
+
+sourceChart =
+new Chart(
+ctx,
+{
+
+type:"pie",
+
+data:{
+
+
+labels:[
+
+"Traffic",
+"Construction",
+"Industry",
+"Other"
+
+],
+
+
+datasets:[{
+
+data:[
+
+data.traffic,
+data.construction,
+data.industry,
+data.other
+
+]
+
+
+}]
+
+
+},
+
+
+options:{
+
+
+plugins:{
+
+
+legend:{
+
+
+labels:{
+
+
+color:"#e2e8f0"
+
+}
+
+}
+
+}
+
+}
+
+
+}
+
+);
+
+}
+
+async function loadEnforcement(){
+
+
+let id =
+document.getElementById(
+"enforcement-select"
+).value;
+
+
+
+if(!id)
+return;
+
+
+
+let data =
+await api(
+
+`/enforcement?station_id=${id}`
+
+);
+
+
+
+document.getElementById(
+"enforcement-body"
+).innerHTML =
+
+
+`
+
+<div class="card">
+
+<h3>
+Priority:
+${data.priority}
+</h3>
+${
+
+data.recommended_actions
+.map(
+a=>
+
+`
+<div class="action-item">
+
+✓ ${a}
+
+</div>
+
+`
+)
+.join("")
+}
+</div>
+
+`;
+}
+
+async function loadRisk(){
+
+let data =
+await api("/city-risk");
+document.getElementById(
+"risk-body"
+).innerHTML=
+
+`
+<div class="cards">
+${
+
+Object.entries(data)
+.map(
+([k,v])=>
+
+card(
+k.replaceAll("_"," "),
+v
+)
+
+)
+.join("")
+
+
+}
+</div>
+
+`;
+}
+
+async function setupExtraDropdowns(){
+let stations =
+await getStations();
+
+let ids=[
+
+"ai-select",
+"source-select",
+"enforcement-select"
+
+];
+
+ids.forEach(id=>{
+let select =
+document.getElementById(id);
+select.innerHTML =
+
+`
+<option value="">
+Select station
+</option>
+
+`
++
+stations.map(
+s=>
+`
+<option value="${s.id}">
+${s.station_name}
+</option>
+
+`
+).join("");
+});
+document
+.getElementById("ai-load")
+.onclick =
+loadAI;
+document
+.getElementById("source-load")
+.onclick =
+loadSources;
+document
+.getElementById("enforcement-load")
+.onclick =
+loadEnforcement;
+}
+
+function openDetails(id){
+go("details",{stationId:id});
+}
+
+async function loadDetails(id){
+const b=el("details-body");
+if(!id){ b.innerHTML='<p class="muted">Select a station.</p>'; return; }
+b.innerHTML='<p class="muted">Loading…</p>';
+try{
+const hist=await api(`/stations/${id}/history`);
+if(!hist.length){ b.innerHTML='<p class="muted">No readings for this station.</p>'; return; }
+const latest=hist[0];
+const pollutants=[["PM2.5",latest.pm25],["PM10",latest.pm10],["CO",latest.co],["NO2",latest.no2],["SO2",latest.so2],["O3",latest.o3]];
+const weather=[["Temperature",latest.temperature],["Humidity",latest.humidity],["Wind Speed",latest.wind_speed],["Pressure",latest.pressure]];
+b.innerHTML=`
+<p class="muted">Latest reading — AQI ${latest.aqi ?? "—"}</p>
+<div class="cards">${pollutants.map(([k,v])=>card(k,num(v))).join("")}</div>
+<div class="cards">${weather.map(([k,v])=>card(k,num(v))).join("")}</div>
+`;
+}catch(e){ b.innerHTML=`<p class="error">Failed to load: ${esc(e.message)}</p>`; }
+}
+
+async function loadPrediction(id){
+const b=el("prediction-body");
+if(!id){ b.innerHTML='<p class="muted">Select a station.</p>'; return; }
+b.innerHTML='<p class="muted">Loading…</p>';
+try{
+const d=await api(`/ml/predict/${id}`);
+if(d.error || d.status==="failed"){ b.innerHTML=`<p class="error">${esc(d.error || d.message)}</p>`; return; }
+b.innerHTML=`<div class="cards">
+${card("Current AQI",num(d.current_aqi))}
+${card("Predicted AQI",num(d.predicted_aqi))}
+${card("Confidence",num(d.confidence)+"%")}
+${card("Category",esc(d.category))}
+</div>`;
+}catch(e){ b.innerHTML=`<p class="error">Failed to load: ${esc(e.message)}</p>`; }
+}
+
+let trendChart;
+async function loadTrend(id,days){
+const b=el("trend-body");
+if(!id){ b.innerHTML='<p class="muted">Select a station.</p>'; return; }
+b.innerHTML='<p class="muted">Loading…</p>';
+try{
+const rows=await api(`/aqi-trend?station_id=${encodeURIComponent(id)}&days=${encodeURIComponent(days||30)}`);
+if(!rows.length){ b.innerHTML='<p class="muted">No data for this period.</p>'; if(trendChart) trendChart.destroy(); return; }
+b.innerHTML=`<p class="muted">${rows.length} readings.</p>`;
+if(trendChart) trendChart.destroy();
+trendChart=new Chart(el("trend-chart"),{
+type:"line",
+data:{labels:rows.map(r=>String(r.timestamp).replace("T"," ").slice(0,16)),datasets:[{label:"AQI",data:rows.map(r=>r.aqi),borderColor:"#38bdf8",backgroundColor:"rgba(56,189,248,.15)",fill:true,tension:.3}]},
+options:{plugins:{legend:{labels:{color:"#e2e8f0"}}}}
+});
+}catch(e){ b.innerHTML=`<p class="error">Failed to load: ${esc(e.message)}</p>`; }
+}
+
+let historyChart;
+async function loadHistory(id){
+const b=el("history-body");
+if(!id){ b.innerHTML='<p class="muted">Select a station.</p>'; return; }
+b.innerHTML='<p class="muted">Loading…</p>';
+try{
+const rows=await api(`/ml/history/${id}`);
+if(!rows.length){ b.innerHTML='<p class="muted">No history.</p>'; if(historyChart) historyChart.destroy(); return; }
+b.innerHTML=`<p class="muted">${rows.length} readings.</p>`;
+if(historyChart) historyChart.destroy();
+historyChart=new Chart(el("history-chart"),{
+type:"line",
+data:{labels:rows.map(r=>String(r.timestamp).replace("T"," ").slice(0,16)),datasets:[{label:"AQI",data:rows.map(r=>r.aqi),borderColor:"#38bdf8",backgroundColor:"rgba(56,189,248,.15)",fill:true,tension:.3}]},
+options:{plugins:{legend:{labels:{color:"#e2e8f0"}}}}
+});
+}catch(e){ b.innerHTML=`<p class="error">Failed to load: ${esc(e.message)}</p>`; }
+}
+
+loaders.map = async function(){
+await loadMap();
+};
+loaders.ai = async function(){
+await setupExtraDropdowns();
+};
+loaders.sources = async function(){
+await setupExtraDropdowns();
+};
+loaders.enforcement = async function(){
+await setupExtraDropdowns();
+};
+loaders.risk = async function(){
+await loadRisk();
+};
+// START APPLICATION
+go("dashboard");
+</script>
 </body>
 </html>
