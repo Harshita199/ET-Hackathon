@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>
+Air Quality Intelligence Platform
+</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link 
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+:root {
+
+--bg:#0f172a;
+--panel:#1e293b;
+--panel2:#334155;
+--text:#e2e8f0;
+--muted:#94a3b8;
+--accent:#38bdf8;
+--border:#334155;
+
+}
+
+
+*{
+box-sizing:border-box;
+}
+body{
+
+margin:0;
+
+font-family:
+system-ui,
+-apple-system,
+Segoe UI,
+Roboto,
+sans-serif;
+
+background:var(--bg);
+
+color:var(--text);
+
+}
+
+
+
+header{
+
+background:var(--panel);
+
+padding:15px 20px;
+
+border-bottom:1px solid var(--border);
+
+}
+header h1{
+
+margin:0 0 10px;
+
+font-size:20px;
+
+}
+
+
+
+nav{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:6px;
+
+}
+nav button{
+
+
+background:var(--panel2);
+
+color:var(--text);
+
+border:1px solid var(--border);
+
+padding:7px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-size:13px;
+
+
+}
+
+
+nav button:hover{
+
+border-color:var(--accent);
+
+}
+
+
+nav button.active{
+
+background:var(--accent);
+
+color:#0f172a;
+
+font-weight:600;
+
+}
+
+
+
+main{
+
+padding:20px;
+
+max-width:1200px;
+
+margin:auto;
+
+}
+section{
+display:none;
+}
+section.active{
+
+display:block;
+
+}
+h2{
+font-size:22px;
+margin-top:0;
+}
+.cards{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(180px,1fr));
+gap:12px;
+}
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:10px;
+padding:16px;
+}
+.card .label{
+color:var(--muted);
+
+font-size:12px;
+
+text-transform:uppercase;
+
+}
+
+
+.card .value{
+
+font-size:25px;
+
+font-weight:700;
+
+margin-top:5px;
+
+}
+
+
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:var(--panel);
+
+border-radius:10px;
+
+overflow:hidden;
+
+}
+
+
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid var(--border);
+
+font-size:14px;
+
+}
+
+
+
+th{
+
+color:var(--muted);
+
+font-size:12px;
+
+text-transform:uppercase;
+
+}
+
+
+
+.controls{
+
+display:flex;
+
+gap:10px;
+
+margin-bottom:15px;
+
+flex-wrap:wrap;
+
+}
+
+
+
+select,input{
+
+background:var(--panel);
+
+color:var(--text);
+
+border:1px solid var(--border);
+
+padding:8px;
+
+border-radius:6px;
+
+}
+
+
+
+button.link{
+
+background:none;
+
+border:1px solid var(--accent);
+
+color:var(--accent);
+
+padding:6px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+
+
+canvas{
+
+background:var(--panel);
+
+border-radius:10px;
+
+padding:10px;
+
+}
+
+
+
+.muted{
+
+color:var(--muted);
+
+}
+
+
+
+.error{
+
+color:#f87171;
+
+}
+
+
+
+.alert{
+
+border-left:4px solid #ef4444;
+
+}
+
+
+
+.subhead{
+
+margin:20px 0 8px;
+
+color:var(--muted);
+
+text-transform:uppercase;
+
+font-size:13px;
+
+}
+
+
+
+#aqi-map{
+
+height:500px;
+
+border-radius:10px;
+
+margin-top:15px;
+
+}
+
+
+
+.ai-section{
+
+
+background:var(--panel);
+
+border:1px solid var(--border);
+
+border-radius:10px;
+
+padding:15px;
+
+margin-bottom:12px;
+
+
+}
+
+
+
+.ai-title{
+
+color:var(--accent);
+
+font-weight:600;
+
+margin-bottom:8px;
+
+}
+
+
+
+.action-item{
+
+padding:8px;
+
+border-bottom:1px solid var(--border);
+
+}
+
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+<header>
+
+
+<h1>
+Air Quality Intelligence Platform
+</h1>
+
+
+<nav id="nav"></nav>
+
+
+</header>
+
+
+
+<main>
+
+
+
+<!-- Dashboard -->
+
+<section id="dashboard">
+
+<h2>Dashboard</h2>
+
+<div id="dashboard-body" class="muted">
+Loading...
+</div>
+
+</section>
+
+
+
+
+<!-- MAP -->
+
+<section id="map">
+
+
+<h2>
+AQI Geospatial Map
+</h2>
+
+
+<div id="aqi-map"></div>
+
+
+</section>
+<!-- Summary -->
+
+
+<section id="summary">
+
+<h2>
+Summary
+</h2>
+
+<div id="summary-body" class="muted">
+Loading...
+</div>
+
+</section>
+<!-- Stations -->
+
+
+<section id="stations">
+
+<h2>
+Monitoring Stations
+</h2>
+
+<div id="stations-body" class="muted">
+Loading...
+</div>
+
+
+</section>
+
+<!-- Details -->
+
+
+<section id="details">
+
+
+<h2>
+Station Details
+</h2>
+
+
+<div class="controls">
+
+<select id="details-select">
+
+</select>
+
+</div>
+
+<div id="details-body" class="muted">
+Select station
+</div>
+</section>
+<!-- Prediction -->
+<section id="prediction">
+<h2>
+AQI Prediction
+</h2>
+<div class="controls">
+<select id="prediction-select"></select>
+</div>
+<div id="prediction-body" class="muted">
+Select station
+</div>
+</section>
+<!-- Trend -->
+<section id="trend">
+<h2>
+AQI Trend
+</h2>
+<div class="controls">
+<select id="trend-select"></select>
+<label>
+Days
+<input 
+type="number"
+id="trend-days"
+value="30"
+/>
+</label>
+<button class="link" id="trend-go">
+Load
+</button>
+</div>
+<div id="trend-body"></div>
+<canvas id="trend-chart" height="120"></canvas>
+</section>
+
+<!-- History -->
+<section id="history">
+<h2>
+AQI History
+</h2>
+<div class="controls">
+<select id="history-select"></select>
+</div>
+<div id="history-body"></div>
+<canvas id="history-chart" height="120"></canvas>
+
+</section>
+
+
+<!-- Alerts -->
+
+
+<section id="alerts">
+
+<h2>
+Pollution Alerts
+</h2>
+
+<div id="alerts-body"></div>
+</section>
+<!-- Top polluted -->
+<section id="top">
+<h2>
+Top Polluted Locations
+</h2>
+<div id="top-body"></div>
+</section>
+<!-- AI -->
+<section id="ai">
+<h2>
+AI Environmental Intelligence
+</h2>
+<div class="controls">
+<select id="ai-select"></select>
+<button class="link" id="ai-load">
+Analyze
+</button>
+</div>
+<div id="ai-body">
+Select station
+</div>
+</section>
+<!-- Sources -->
+<section id="sources">
+<h2>
+Pollution Source Attribution
+</h2>
+<div class="controls">
+<select id="source-select"></select>
+<button class="link" id="source-load">
+Analyze
+</button>
+</div>
+<div class="card">
+<canvas id="source-chart"></canvas>
+</div>
+</section>
+<!-- Enforcement -->
+<section id="enforcement">
+<h2>
+Enforcement Recommendation
+</h2>
+<div class="controls">
+<select id="enforcement-select"></select>
+<button class="link" id="enforcement-load">
+Generate
+</button>
+</div>
+<div id="enforcement-body"></div>
+</section>
+<!-- Risk -->
+<section id="risk">
+<h2>
+City Risk Intelligence
+</h2>
+
+<div id="risk-body">
+Loading...
+</div>
+</section>
+</main>
+<script>
+
+
+const API = "http://localhost:8000";
+
+
+async function api(path){
+
+    const response = await fetch(API + path);
+
+    if(!response.ok){
+
+        throw new Error(
+            response.status + " " + response.statusText
+        );
+
+    }
+
+    return response.json();
+
+}
+const el = id => document.getElementById(id);
+
+
+const esc = value =>
+String(value ?? "")
+.replace(/[&<>]/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;"
+}[c]));
+
+
+
+const num = (v,d=2)=>
+(v===null || v===undefined)
+?
+"—"
+:
+Number(v).toFixed(d);
+function card(label,value){
+
+return `
+
+<div class="card">
+
+<div class="label">
+${label}
+</div>
+
+<div class="value">
+${value}
+</div>
+
+</div>
+
+`;
+
+}
+
+const PAGES=[
+["dashboard","Dashboard"],
+["map","AQI Map"],
+["summary","Summary"],
+["stations","Stations"],
+["details","Details"],
+["prediction","Prediction"],
+["trend","Trend"],
+["history","History"],
+["alerts","Alerts"],
+["top","Top Polluted"],
+["ai","AI Insights"],
+["sources","Sources"],
+["enforcement","Enforcement"],
+["risk","City Risk"]
+];
+const nav=el("nav");
+PAGES.forEach(([id,name])=>{
+let btn=document.createElement("button");
+btn.innerText=name;
+btn.dataset.page=id;
+btn.onclick=()=>go(id);
+nav.appendChild(btn);
+});
+
+const loaded={};
+
+
+function go(id,opts={}){
+
+
+document
+.querySelectorAll("section")
+.forEach(
+s=>s.classList.toggle(
+"active",
+s.id===id
+)
+);
+
+
+
+document
+.querySelectorAll("nav button")
+.forEach(
+b=>b.classList.toggle(
+"active",
+b.dataset.page===id
+)
+);
+
+
+
+if(loaders[id])
+
+loaders[id](opts);
+
+
+
+}
+
+let stationsCache=null;
+async function getStations(){
+
+
+if(!stationsCache)
+
+stationsCache =
+await api("/stations");
+
+
+return stationsCache;
+
+
+}
+
+
+
+async function fillSelect(select){
+
+
+const stations =
+await getStations();
+
+
+
+select.innerHTML =
+`
+<option value="">
+Select station
+</option>
+`
++
+stations.map(
+s=>
+`
+
+<option value="${s.id}">
+${esc(s.station_name)} - ${esc(s.city)}
+</option>
+
+`
+).join("");
+
+
+
+}
+
+const loaders={
+
+async dashboard(){
+
+
+if(loaded.dashboard)
+return;
+
+
+loaded.dashboard=true;
+
+
+let d =
+await api("/dashboard");
+
+
+
+el("dashboard-body").innerHTML=
+
+
+`
+
+<div class="cards">
+
+${card(
+"Average AQI",
+num(d.average_aqi)
+)}
+
+
+${card(
+"Stations",
+d.total_stations
+)}
+
+
+
+${card(
+"Cities",
+d.cities
+)}
+
+
+${card(
+"Worst City",
+d.worst_city
+)}
+
+
+${card(
+"Worst AQI",
+d.worst_aqi
+)}
+
+
+
+</div>
+
+`;
+
+},
+
+async summary(){
+
+
+if(loaded.summary)
+return;
+
+
+loaded.summary=true;
+
+
+let d =
+await api("/summary");
+
+
+
+el("summary-body").innerHTML=
+
+
+`
+
+<div class="cards">
+
+${card("Stations",d.stations)}
+
+${card("Average AQI",num(d.average_aqi))}
+
+${card("Good",d.good)}
+
+${card("Moderate",d.moderate)}
+
+${card("Poor",d.poor)}
+
+${card("Very Poor",d.very_poor)}
+
+${card("Severe",d.severe)}
+
+
+</div>
+
+`;
+
+},
+
+
+async stations(){
+
+
+if(loaded.stations)
+return;
+
+
+loaded.stations=true;
+
+
+
+let rows =
+await getStations();
+
+
+
+el("stations-body").innerHTML=
+
+`
+
+<table>
+
+<tr>
+
+<th>Station</th>
+<th>City</th>
+<th>AQI</th>
+<th></th>
+
+</tr>
+
+
+${
+rows.map(
+s=>
+`
+
+<tr>
+
+<td>${esc(s.station_name)}</td>
+
+<td>${esc(s.city)}</td>
+
+<td>${s.aqi ?? "-"}</td>
+
+
+<td>
+
+<button class="link"
+onclick="openDetails('${s.id}')">
+
+Details
+
+</button>
+
+
+</td>
+
+</tr>
+
+
+`
+).join("")
+}
+
+
+</table>
+
+`;
+
+},
+
+async details(){
+
+
+let sel=el("details-select");
+
+
+if(!loaded.details){
+
+
+loaded.details=true;
+
+
+await fillSelect(sel);
+
+
+
+sel.onchange=()=>loadDetails(sel.value);
+
+
+}
+
+
+},
+
+
+async prediction(){
+
+
+let sel=el("prediction-select");
+
+
+if(!loaded.prediction){
+
+
+loaded.prediction=true;
+
+
+await fillSelect(sel);
+
+
+sel.onchange=()=>loadPrediction(sel.value);
+
+
+
+}
+
+
+},
+
+
+async trend(){
+
+
+let sel=el("trend-select");
+
+
+if(!loaded.trend){
+
+
+loaded.trend=true;
+
+
+await fillSelect(sel);
+
+
+el("trend-go").onclick=()=>{
+
+loadTrend(
+sel.value,
+el("trend-days").value
+);
+
+
+};
+
+
+}
+
+
+},
+
+
+async history(){
+
+
+let sel=el("history-select");
+
+
+if(!loaded.history){
+
+
+loaded.history=true;
+
+
+await fillSelect(sel);
+
+
+sel.onchange=()=>loadHistory(sel.value);
+
+
+
+}
+
+},
+
+async alerts(){
+
+
+if(loaded.alerts)
+return;
+
+
+loaded.alerts=true;
+
+
+
+let data =
+await api("/alerts");
+
+
+
+el("alerts-body").innerHTML=
+
+
+data.map(
+a=>
+`
+
+<div class="card alert">
+
+<h3>
+${a.severity}
+</h3>
+
+
+AQI :
+${a.aqi}
+
+
+<br>
+
+${a.station}
+
+
+</div>
+
+
+`
+).join("");
+
+
+
+},
+
+async top(){
+
+
+if(loaded.top)
+return;
+
+
+loaded.top=true;
+
+
+let data=
+await api("/top-polluted");
+
+el("top-body").innerHTML=
+
+`
+
+<table>
+
+
+<tr>
+
+<th>Rank</th>
+<th>City</th>
+<th>Station</th>
+<th>AQI</th>
+
+</tr>
+
+
+${
+data.map(
+(r,i)=>
+`
+
+<tr>
+
+<td>${i+1}</td>
+
+<td>${r.city}</td>
+
+<td>${r.station}</td>
+
+<td>${r.aqi}</td>
+
+</tr>
+
+`
+).join("")
+}
+
+
+</table>
+
+`;
+
+}
+
+
+};
+let map;
+async function loadMap(){
+
+
+if(map)
+return;
+
+
+map = L.map("aqi-map").setView(
+[22.9734,78.6569],
+5
+);
+
+
+
+L.tileLayer(
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+    attribution:"OpenStreetMap"
+}
+).addTo(map);
+
+
+
+const data =
+await api("/geospatial/hotspots");
+
+
+
+data.forEach(point=>{
+
+
+let color =
+point.marker_color || "orange";
+
+
+
+let marker =
+L.circleMarker(
+[
+point.latitude,
+point.longitude
+],
+{
+radius:10,
+color:color
+}
+);
+
+
+
+marker.bindPopup(
+
+`
+
+<b>${point.station}</b>
+<br>
+
+City: ${point.city}
+
+<br>
+
+AQI:
+${point.aqi}
+
+<br>
+
+Category:
+${point.category}
+
+`
+
+);
+
+
+
+marker.addTo(map);
+
+
+
+});
+
+
+
+}
+
+
+async function loadAI(){
+
+
+let id =
+document.getElementById(
+"ai-select"
+).value;
+
+
+
+if(!id)
+return;
+
+
+
+let data =
+await api(
+`/ai-insights?station_id=${id}`
+);
+
+
+
+let ai =
+data.llm_insights;
+
+
+
+let html="";
+
+
+
+if(typeof ai==="object"){
+
+
+Object.keys(ai).forEach(k=>{
+
+
+html +=
+
+`
+
+<div class="ai-section">
+
+
+<div class="ai-title">
+
+${k.replaceAll("_"," ").toUpperCase()}
+
+</div>
+
+
+<div>
+
+${ai[k]}
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+}
+else{
+
+
+html =
+
+`
+
+<div class="ai-section">
+
+${ai}
+
+</div>
+
+`;
+
+}
+
+
+
+document.getElementById(
+"ai-body"
+).innerHTML=html;
+
+
+}
+
+let sourceChart;
+
+async function loadSources(){
+let id =
+document.getElementById(
+"source-select"
+).value;
+
+if(!id)
+return;
+
+let data =
+await api(
+`/source-attribution?station_id=${id}`
+);
+
+let ctx =
+document
+.getElementById(
+"source-chart"
+);
+
+if(sourceChart)
+sourceChart.destroy();
+
+sourceChart =
+new Chart(
+ctx,
+{
+
+type:"pie",
+
+data:{
+
+
+labels:[
+
+"Traffic",
+"Construction",
+"Industry",
+"Other"
+
+],
+
+
+datasets:[{
+
+data:[
+
+data.traffic,
+data.construction,
+data.industry,
+data.other
+
+]
+
+
+}]
+
+
+},
+
+
+options:{
+
+
+plugins:{
+
+
+legend:{
+
+
+labels:{
+
+
+color:"#e2e8f0"
+
+}
+
+}
+
+}
+
+}
+
+
+}
+
+);
+
+}
+
+async function loadEnforcement(){
+
+
+let id =
+document.getElementById(
+"enforcement-select"
+).value;
+
+
+
+if(!id)
+return;
+
+
+
+let data =
+await api(
+
+`/enforcement?station_id=${id}`
+
+);
+
+
+
+document.getElementById(
+"enforcement-body"
+).innerHTML =
+
+
+`
+
+<div class="card">
+
+<h3>
+Priority:
+${data.priority}
+</h3>
+${
+
+data.recommended_actions
+.map(
+a=>
+
+`
+<div class="action-item">
+
+✓ ${a}
+
+</div>
+
+`
+)
+.join("")
+}
+</div>
+
+`;
+}
+
+async function loadRisk(){
+
+let data =
+await api("/city-risk");
+document.getElementById(
+"risk-body"
+).innerHTML=
+
+`
+<div class="cards">
+${
+
+Object.entries(data)
+.map(
+([k,v])=>
+
+card(
+k.replaceAll("_"," "),
+v
+)
+
+)
+.join("")
+
+
+}
+</div>
+
+`;
+}
+
+async function setupExtraDropdowns(){
+let stations =
+await getStations();
+
+let ids=[
+
+"ai-select",
+"source-select",
+"enforcement-select"
+
+];
+
+ids.forEach(id=>{
+let select =
+document.getElementById(id);
+select.innerHTML =
+
+`
+<option value="">
+Select station
+</option>
+
+`
++
+stations.map(
+s=>
+`
+<option value="${s.id}">
+${s.station_name}
+</option>
+
+`
+).join("");
+});
+document
+.getElementById("ai-load")
+.onclick =
+loadAI;
+document
+.getElementById("source-load")
+.onclick =
+loadSources;
+document
+.getElementById("enforcement-load")
+.onclick =
+loadEnforcement;
+}
+
+loaders.map = async function(){
+await loadMap();
+};
+loaders.ai = async function(){
+await setupExtraDropdowns();
+};
+loaders.sources = async function(){
+await setupExtraDropdowns();
+};
+loaders.enforcement = async function(){
+await setupExtraDropdowns();
+};
+loaders.risk = async function(){
+await loadRisk();
+};
+// START APPLICATION
+go("dashboard");
+</script>
+</body>
+</html>
