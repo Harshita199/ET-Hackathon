@@ -361,6 +361,48 @@ border-bottom:1px solid var(--border);
 
 
 
+button.link:disabled{
+
+opacity:.6;
+
+cursor:not-allowed;
+
+}
+
+
+
+.spinner{
+
+display:inline-block;
+
+width:12px;
+
+height:12px;
+
+border:2px solid rgba(15,23,42,.35);
+
+border-top-color:#0f172a;
+
+border-radius:50%;
+
+margin-right:6px;
+
+vertical-align:-1px;
+
+animation:spin .7s linear infinite;
+
+}
+
+
+
+@keyframes spin{
+
+to{ transform:rotate(360deg); }
+
+}
+
+
+
 </style>
 
 
@@ -1262,6 +1304,16 @@ return;
 
 
 
+let btn = document.getElementById("ai-load");
+let body = document.getElementById("ai-body");
+
+let originalLabel = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = `<span class="spinner"></span>Analyzing…`;
+body.innerHTML = `<p class="muted"><span class="spinner"></span>Running AI analysis, this can take a moment…</p>`;
+
+try{
+
 let data =
 await api(
 `/ai-insights?station_id=${id}`
@@ -1335,9 +1387,18 @@ ${ai}
 
 
 
-document.getElementById(
-"ai-body"
-).innerHTML=html;
+body.innerHTML=html;
+
+}catch(e){
+
+body.innerHTML = `<p class="error">Failed to load AI insights: ${esc(e.message)}</p>`;
+
+}finally{
+
+btn.disabled = false;
+btn.innerHTML = originalLabel;
+
+}
 
 
 }
@@ -1493,35 +1554,33 @@ a=>
 `;
 }
 
-async function loadRisk(){
-
-let data =
-await api("/city-risk");
-document.getElementById(
-"risk-body"
-).innerHTML=
-
-`
-<div class="cards">
-${
-
-Object.entries(data)
-.map(
-([k,v])=>
-
-card(
-k.replaceAll("_"," "),
-v
-)
-
-)
-.join("")
-
-
-}
+async function loadRisk() {
+ 
+    const data = await api("/city-risk");
+ 
+    let html = '<div class="cards">';
+ 
+    data.forEach(city => {
+ 
+        html += `
+<div class="card">
+<div class="label">${city.city}</div>
+ 
+                <div class="value">
+                    AQI ${Number(city.average_aqi).toFixed(1)}
 </div>
-
-`;
+ 
+                <div style="margin-top:10px">
+<strong>Risk:</strong> ${city.risk}
+</div>
+</div>
+        `;
+ 
+    });
+ 
+    html += "</div>";
+ 
+    document.getElementById("risk-body").innerHTML = html;
 }
 
 async function setupExtraDropdowns(){
