@@ -309,3 +309,18 @@ class DashboardService:
             rank += 1
 
         return rankings
+
+    @staticmethod
+    def get_summary(db: Session):
+    
+        data = DashboardService.dashboard(db)
+    
+        return {
+            "stations": data["total_stations"],
+            "average_aqi": data["average_aqi"],
+            "good": data["good_air_stations"],
+            "moderate": data["moderate_air_stations"],
+            "poor": data["poor_air_stations"],
+            "very_poor": data["very_poor_air_stations"],
+            "severe": data["severe_air_stations"],
+        }

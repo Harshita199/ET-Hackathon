@@ -5,11 +5,29 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_db
 from app.core.config import settings
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
