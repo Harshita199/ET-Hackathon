@@ -306,17 +306,83 @@ def history(station_id: str, db: Session = Depends(get_db)):
     ]
 
 
+# @app.get("/dashboard")
+# def dashboard(db: Session = Depends(get_db)):
+#     return DashboardService.get_dashboard(db)
+
+# @app.get("/alerts")
+# def alerts(db: Session = Depends(get_db)):
+#     return DashboardService.alerts(db)
+
+# @app.get("/top-polluted")
+# def top_polluted(db: Session = Depends(get_db)):
+#     return DashboardService.top_polluted(db)
+
+# @app.get("/aqi-trend")
+# def aqi_trend(
+#     station_id: str,
+#     days: int = 30,
+#     db: Session = Depends(get_db)
+# ):
+#     return DashboardService.aqi_trend(
+#         db,
+#         station_id,
+#         days,
+#     )
+
+from app.services.source_attribution import SourceAttributionService
+@app.get("/source-attribution")
+def source_attribution(
+    station_id: str,
+    db: Session = Depends(get_db)
+):
+    return SourceAttributionService.analyze(
+        db,
+        station_id
+    )
+
+from app.services.enforcement import EnforcementService
+@app.get("/enforcement")
+def enforcement(
+    station_id: str,
+    db: Session = Depends(get_db)
+):
+    return EnforcementService.recommend(
+        db,
+        station_id
+    )
+
+
+from app.services.ai_insights import AIInsightsService
+@app.get("/ai-insights")
+def ai_insights(
+    station_id: str,
+    db: Session = Depends(get_db)
+):
+    return AIInsightsService.analyze(
+        db,
+        station_id
+    )
+
+
+#####################
 @app.get("/dashboard")
 def dashboard(db: Session = Depends(get_db)):
-    return DashboardService.get_dashboard(db)
+    return DashboardService.dashboard(db)
+
+
+@app.get("/top-polluted")
+def top_polluted(
+    limit: int = 10,
+    db: Session = Depends(get_db)
+):
+    return DashboardService.top_polluted(db, limit)
+
 
 @app.get("/alerts")
 def alerts(db: Session = Depends(get_db)):
     return DashboardService.alerts(db)
 
-@app.get("/top-polluted")
-def top_polluted(db: Session = Depends(get_db)):
-    return DashboardService.top_polluted(db)
 
 @app.get("/aqi-trend")
 def aqi_trend(
@@ -327,5 +393,47 @@ def aqi_trend(
     return DashboardService.aqi_trend(
         db,
         station_id,
-        days,
+        days
     )
+
+
+@app.get("/city-comparison")
+def city_comparison(
+    db: Session = Depends(get_db)
+):
+    return DashboardService.city_comparison(db)
+
+
+@app.get("/city-rankings")
+def city_rankings(
+    db: Session = Depends(get_db)
+):
+    return DashboardService.city_rankings(db)
+
+from app.services.geospatial import GeospatialService
+@app.get("/geospatial/hotspots")
+def geospatial_hotspots(
+    db: Session = Depends(get_db)
+):
+    return GeospatialService.hotspots(db)
+
+from app.services.intelligence import IntelligenceService
+@app.get("/city-risk")
+def city_risk(
+    db: Session = Depends(get_db)
+):
+    return IntelligenceService.city_risk(db)
+
+
+@app.get("/interventions")
+def interventions(
+    db: Session = Depends(get_db)
+):
+    return IntelligenceService.interventions(db)
+
+
+@app.get("/health-risk")
+def health_risk(
+    db: Session = Depends(get_db)
+):
+    return IntelligenceService.health_risk(db)
